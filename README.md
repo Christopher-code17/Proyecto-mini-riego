@@ -6,7 +6,16 @@ El Sistema de Mini Riego Automatizado utiliza un módulo ESP8266 y un módulo Bl
 - Configuración de riego automático basada en temperatura.
 - Monitorización en tiempo real consumiendo una API para conocer el estado del riego según la ubicación deseada.
 - Interfaz de usuario amigable.
+- Base de datos para el monitoreo de datos.
+- Exportación de datos para auditorias.
 ## Requisitos
+#### Software:
+- Sqlite
+- Node.js
+- Proteus 8 profesional
+- MIT APP Inventor
+- Cuenta en OpenWeather
+#### Hardware:
 - Arduino Uno
 - Módulo Bluetooth HC-06
 - Módulo ESP8266
@@ -15,30 +24,17 @@ El Sistema de Mini Riego Automatizado utiliza un módulo ESP8266 y un módulo Bl
 - Sensores de humedad (opcional)
 - Jumpers y protoboard para las conexiones
 ## Tecnologías Utilizadas
+<p align="center">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/Arduino_Logo.svg" alt="Arduino" width="100"/>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" alt="C++" width="80"/>
+  <img src="https://nodejs.org/static/images/logo.svg" alt="Node.js" width="150"/>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/61/HTML5_logo_and_wordmark.svg" alt="HTML" width="100"/>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/3/38/SQLite370.svg" alt="DB Browser (SQLite)" width="150"/>
+  <img src="https://openweathermap.org/themes/openweathermap/assets/img/logo_white_cropped.png" alt="OpenWeather" width="150"/>
+  <img src="https://appinventor.mit.edu/images/appinventor_logo.png" alt="MIT App Inventor" width="100"/>
+  <img src="https://www.labcenter.com/images/logo.png" alt="Proteus 8 Professional" width="100"/>
+</p>
 
-### Arduino
-![Arduino](https://upload.wikimedia.org/wikipedia/commons/8/87/Arduino_Logo.svg)
 
-### C++
-![C++](https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg)
-
-### Node.js
-![Node.js](https://nodejs.org/static/images/logo.svg)
-
-### HTML
-![HTML](https://upload.wikimedia.org/wikipedia/commons/6/61/HTML5_logo_and_wordmark.svg)
-
-### DB Browser (SQLite)
-![DB Browser](https://sqlitebrowser.org/images/sqlitebrowser_logo.png)
-
-### OpenWeather API
-![OpenWeather](https://openweathermap.org/themes/openweathermap/assets/img/logo_white_cropped.png)
-
-### MIT App Inventor
-![MIT App Inventor](https://upload.wikimedia.org/wikipedia/commons/e/e7/App_Inventor_Logo.png)
-
-### Proteus 8 Professional
-![Proteus 8 Professional](https://upload.wikimedia.org/wikipedia/en/5/58/Proteus_Design_Suite_Logo.png)
-
-###Diagrama del circuito
+## Diagrama del circuito
 ![imagen](https://github.com/Christopher-code17/Proyecto-mini-riego/assets/72567244/9e05e329-ae93-45f6-ae77-113cc44683d3)
