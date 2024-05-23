@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plantaciones Zetino</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+        .container {
+            width: 80%;
+            max-width: 800px;
+            margin: auto;
+            text-align: center;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .logo img {
+            width: 200px;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #exportButton {
+            background-color: #FFA500;
+        }
+        #exportButton:hover {
+            background-color: #FF8C00;
+        }
+        #message {
+            font-size: 18px;
+            margin-top: 20px;
+            color: #ff0000;
+        }
+        #regando {
+            color: green;
+        }
+        #no-regando {
+            color: red;
+        }
+        table {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        #weather {
+            margin-top: 20px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="logo.png" alt="Logo">
+        </div>
+        <h1>Plantaciones Zetino</h1>
+        <button id="exportButton">Exportar Datos</button>
+        <button id="onButton">Encender Riego</button>
+        <button id="offButton" disabled>Apagar Riego</button>
+        <div id="message"></div>
+        <table id="logTable">
+            <thead>
+                <tr>
+                    <th>Acción</th>
+                    <th>Hora</th>
+                    <th>Porcentaje de Agua Ahorrado</th>
+                    <th>Caudal (L/s)</th>
+                    <th>Humedad (%)</th>
+                    <th>Temperatura (°C)</th>
+                </tr>
+            </thead>
+            <tbody id="logContainer">
+            </tbody>
+        </table>
+        <div id="weather">
+            <h2>Clima para hoy en Fraijanes, Guatemala</h2>
+            <p id="weatherInfo">Cargando información del clima...</p>
+        </div>
+    </div>
+
+    <script>
+        let isIrrigating = false;
+        let irrigationStartTime = null;
+
+        document.getElementById('onButton').addEventListener('click', () => {
+            if (isIrrigating) {
+                document.getElementById('message').innerHTML = '<p id="regando">Ya se está regando las plantas.</p>';
+            } else {
+                fetch('/api/irrigation/pump/on', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        isIrrigating = true;
+                        irrigationStartTime = new Date();
+                        document.getElementById('message').innerHTML = '<p id="regando">Usted está regando las plantas</p>';
+                        logAction('Encender Riego', '-', '-', '-', '-');
+                        document.getElementById('onButton').disabled = true;
+                        document.getElementById('offButton').disabled = false;
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        });
+
+        document.getElementById('offButton').addEventListener('click', () => {
+            if (!isIrrigating) {
+                document.getElementById('message').innerHTML = '<p id="no-regando">El riego ya está apagado.</p>';
+            } else {
+                fetch('/api/irrigation/pump/off', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        isIrrigating = false;
+                        const irrigationEndTime = new Date();
+                        const irrigationDuration = (irrigationEndTime - irrigationStartTime) / 1000;
+                        const waterSavedPercentage = Math.floor(irrigationDuration / 10) * 2;
+                        const caudal = 0.5; // Puedes ajustar esta fórmula según tus necesidades
+                        const humedad = '50%'; // Estos valores se pueden actualizar con sensores reales
+                        const temperatura = '25°C'; // Estos valores se pueden actualizar con sensores reales
+                        document.getElementById('message').innerHTML = '<p id="no-regando">Usted no está regando las plantas</p>';
+                        logAction('Apagar Riego', `${waterSavedPercentage}%`, `${caudal} L/s`, humedad, temperatura);
+                        document.getElementById('onButton').disabled = false;
+                        document.getElementById('offButton').disabled = true;
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        });
+
+        function logAction(action, waterSaved, caudal, humedad, temperatura) {
+            const table = document.getElementById('logContainer');
+            const row = document.createElement('tr');
+            const actionCell = document.createElement('td');
+            const timeCell = document.createElement('td');
+            const waterSavedCell = document.createElement('td');
+            const caudalCell = document.createElement('td');
+            const humedadCell = document.createElement('td');
+            const temperaturaCell = document.createElement('td');
+            actionCell.textContent = action;
+            timeCell.textContent = new Date().toLocaleTimeString();
+            waterSavedCell.textContent = waterSaved;
+            caudalCell.textContent = caudal;
+            humedadCell.textContent = humedad;
+            temperaturaCell.textContent = temperatura;
+            row.appendChild(actionCell);
+            row.appendChild(timeCell);
+            row.appendChild(waterSavedCell);
+            row.appendChild(caudalCell);
+            row.appendChild(humedadCell);
+            row.appendChild(temperaturaCell);
+            table.appendChild(row);
+        }
+
+        // Función para exportar datos
+        document.getElementById('exportButton').addEventListener('click', () => {
+            const table = document.getElementById('logTable');
+            const rows = table.querySelectorAll('tr');
+            const data = [];
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('th, td');
+                const rowData = [];
+                cells.forEach(cell => {
+                    rowData.push(cell.textContent);
+                });
+                data.push(rowData);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Registro de Riego");
+
+            XLSX.writeFile(wb, "registro_de_riego.xlsx");
+        });
+
+        // Obtener y mostrar información del clima
+        fetch('/api/weather')
+            .then(response => response.json())
+            .then(data => {
+                const weatherInfo = `${data.weather[0].description}, ${data.main.temp}°C, Humedad: ${data.main.humidity}%`;
+                document.getElementById('weatherInfo').textContent = weatherInfo;
+            })
+            .catch(error => {
+                console.error('Error obteniendo la información del clima:', error);
+                document.getElementById('weatherInfo').textContent = 'No se pudo obtener la información del clima.';
+            });
+    </script>
+</body>
+</html>

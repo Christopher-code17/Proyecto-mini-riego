@@ -1,0 +1,23 @@
+{
+  "name": "proyectominiriego",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.mjs",
+  "type": "module",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mssql": "^10.0.2",
+    "node-fetch": "^3.0.0",
+    "sequelize": "^6.37.3",
+    "sqlite3": "^5.1.7",
+    "tedious": "^18.2.0"
+  },
+  "devDependencies": {
+    "jest": "^26.6.3"
+  }
+}
